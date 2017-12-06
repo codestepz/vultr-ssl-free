@@ -1,0 +1,33 @@
+version: '3.3'
+
+services:
+
+  php7fpm:
+    build: ./build/php7fpm
+    container_name: docker-php7fpm
+    working_dir: /usr/share/nginx/html
+    restart: always
+    environment:
+      - TERM=xterm
+    volumes:
+      - ./www:/usr/share/nginx/html
+      - ./config/php7.ini:/usr/local/etc/php/php.ini
+    ports:
+      - "9000:9000"
+
+  nginx:
+    image: nginx:1.12.1
+    container_name: docker-nginx
+    working_dir: /usr/share/nginx/html    
+    restart: always
+    volumes:
+      - ./www:/usr/share/nginx/html
+      - ./config/ssl:/etc/nginx/ssl
+      - ./config/vhosts:/etc/nginx/conf.d/vhosts
+      - ./config/default.conf:/etc/nginx/conf.d/default.conf
+      - ./config/nginx.conf:/etc/nginx/nginx.conf
+    links:
+      - "php7fpm:phpfpm"
+    ports:
+      - "80:80"
+      - "443:443"
